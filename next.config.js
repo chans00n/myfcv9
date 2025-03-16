@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   experimental: {
     // Enable PPR since it's already enabled in your build
     ppr: true
@@ -12,9 +11,6 @@ const nextConfig = {
     // Return the modified config
     return config;
   },
-  // Skip API routes during static export
-  skipTrailingSlashRedirect: true,
-  skipApiRoutes: true,
 };
 
 module.exports = nextConfig; 
