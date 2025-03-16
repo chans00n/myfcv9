@@ -5,6 +5,8 @@ import { UserProvider } from '@/lib/auth';
 import { getUser } from '@/lib/db/queries';
 import { ThemeProvider } from '@/components/theme-provider';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'MYFC - Elevate Your Routine with Facial Fitness',
   description: 'Make facial fitness a natural part of your daily wellness routine-because when you look strong, you feel strong.',
