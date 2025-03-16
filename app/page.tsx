@@ -1,11 +1,23 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CreditCard, Database } from 'lucide-react';
 import { Terminal } from '@/components/terminal';
-import MarketingLayout from './marketing-layout';
+// Temporarily comment out the marketing layout
+// import MarketingLayout from './marketing-layout';
 
 export default function HomePage() {
   return (
-    <MarketingLayout>
+    // <MarketingLayout>
+    <div className="min-h-screen">
+      <header className="border-b">
+        <div className="container flex h-16 items-center px-4">
+          <div className="font-bold">MYFC</div>
+          <div className="ml-auto flex items-center space-x-4">
+            <Button asChild variant="outline" size="sm">
+              <a href="/sign-in">Sign In</a>
+            </Button>
+          </div>
+        </div>
+      </header>
       <main className="overflow-x-hidden">
         <section className="py-12 md:py-20">
           <div className="container px-4 mx-auto">
@@ -125,6 +137,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-    </MarketingLayout>
+    </div>
+    // </MarketingLayout>
   );
 } 
