@@ -13,16 +13,16 @@ export default function RootLayout({
   let userPromise = getUser();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>MYFC - Test Page</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <UserProvider userPromise={userPromise}>{children}</UserProvider>
