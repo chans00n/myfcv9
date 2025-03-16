@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "rm -rf .next && pnpm run build",
   "cleanUrls": true,
-  "outputDirectory": ".next",
+  "outputDirectory": "out",
   "github": {
     "silent": true
   }

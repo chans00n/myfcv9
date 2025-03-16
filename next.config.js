@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  output: 'export',
   experimental: {
-    // Disable client reference manifest for now
-    clientReferenceManifest: false,
     // Enable PPR since it's already enabled in your build
     ppr: true
   },

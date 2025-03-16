@@ -25,4 +25,15 @@ if (fs.existsSync('.next')) {
   }
 } else {
   console.log('.next directory does not exist');
+}
+
+// Check if the out directory exists
+if (fs.existsSync('out')) {
+  console.log('out directory exists');
+  
+  // List files in the out directory
+  const outFiles = fs.readdirSync('out');
+  console.log('Files in out directory:', outFiles);
+} else {
+  console.log('out directory does not exist');
 } 
