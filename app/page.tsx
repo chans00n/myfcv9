@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CreditCard, Database } from 'lucide-react';
-import { Terminal } from './(dashboard)/terminal';
+import { Terminal } from '@/components/terminal';
 import MarketingLayout from './marketing-layout';
 
 export default function HomePage() {
