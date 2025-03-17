@@ -138,7 +138,13 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                     </div>
                     <div className="flex-1 w-full">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-baseline gap-3 md:gap-0">
-                        <h4 className="font-medium">{subscriptionDetails.subscription.product.name}</h4>
+                        <div>
+                          <h4 className="font-medium">{subscriptionDetails.subscription.product.name}</h4>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {formatCurrency(subscriptionDetails.subscription.price.unitAmount)}/
+                            {subscriptionDetails.subscription.price.interval}, billed {subscriptionDetails.subscription.price.interval}ly
+                          </p>
+                        </div>
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -148,10 +154,6 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                           Change plan
                         </Button>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {formatCurrency(subscriptionDetails.subscription.price.unitAmount)}/
-                        {subscriptionDetails.subscription.price.interval}, billed {subscriptionDetails.subscription.price.interval}ly
-                      </p>
                     </div>
                   </div>
                   
@@ -182,9 +184,14 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                       </div>
                       <div className="flex-1 w-full">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-baseline gap-3 md:gap-0">
-                          <h4 className="font-medium capitalize">
-                            {subscriptionDetails.paymentMethod.brand} ending in {subscriptionDetails.paymentMethod.last4}
-                          </h4>
+                          <div>
+                            <h4 className="font-medium capitalize">
+                              {subscriptionDetails.paymentMethod.brand} ending in {subscriptionDetails.paymentMethod.last4}
+                            </h4>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Expires {subscriptionDetails.paymentMethod.expMonth}/{subscriptionDetails.paymentMethod.expYear}
+                            </p>
+                          </div>
                           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                             <Button 
                               variant="outline" 
@@ -204,9 +211,6 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                             </Button>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Expires {subscriptionDetails.paymentMethod.expMonth}/{subscriptionDetails.paymentMethod.expYear}
-                        </p>
                       </div>
                     </div>
                   ) : (
