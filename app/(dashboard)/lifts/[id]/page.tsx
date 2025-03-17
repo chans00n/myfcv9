@@ -124,14 +124,15 @@ const lifts = [
 
 // Add a type for the props
 type Props = {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
   searchParams: Record<string, string | string[] | undefined>;
 };
 
-export default function Page(props: Props) {
-  const id = props.params.id;
+export default async function Page(props: Props) {
+  // Await the params
+  const params = await props.params;
+  const id = params.id;
+  
   const lift = lifts.find(l => l.id === id);
   
   if (!lift) {
