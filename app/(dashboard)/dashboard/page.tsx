@@ -14,10 +14,16 @@ import {
   UserCog,
   UserMinus,
   Mail,
-  CheckCircle
+  CheckCircle,
+  Calendar,
+  Clock,
+  Dumbbell,
+  Play
 } from 'lucide-react';
 import Link from 'next/link';
 import { ActivityType } from '@/lib/db/schema';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import Image from 'next/image';
 
 // Helper functions for activity feed
 function getRelativeTime(date: Date) {
@@ -115,6 +121,17 @@ export default async function DashboardPage() {
   const logs = await getActivityLogs();
   const welcomeMessage = getRandomWelcomeMessage(user.name || 'there');
 
+  // This would be fetched from your database in a real implementation
+  const todaysLift = {
+    id: "lift-2023-03-17",
+    title: "Full Body Power",
+    date: "March 17, 2023",
+    duration: "45 minutes",
+    intensity: "Moderate",
+    description: "This full-body workout focuses on building power through compound movements.",
+    thumbnailUrl: "/placeholder.jpg",
+  };
+
   return (
     <div className="flex-1 space-y-6 p-4 pt-6">
       <div className="flex items-center justify-between">
@@ -127,6 +144,64 @@ export default async function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* Today's Lift Card */}
+      <Card className="w-full overflow-hidden">
+        <CardHeader className="pb-0">
+          <CardTitle className="text-xl font-bold">Today's Lift</CardTitle>
+          <CardDescription>Your daily workout with Coach Zionna</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="relative rounded-lg overflow-hidden">
+              <AspectRatio ratio={16 / 9}>
+                <Image 
+                  src={todaysLift.thumbnailUrl} 
+                  alt={todaysLift.title}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <Button size="icon" className="rounded-full w-12 h-12 flex items-center justify-center">
+                    <Play className="h-6 w-6 ml-0.5" />
+                  </Button>
+                </div>
+              </AspectRatio>
+            </div>
+            <div className="flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-bold mb-2">{todaysLift.title}</h3>
+                <p className="text-muted-foreground mb-4">{todaysLift.description}</p>
+                <div className="flex flex-wrap gap-4 mb-4">
+                  <div className="flex items-center gap-1 text-sm">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <span>{todaysLift.date}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span>{todaysLift.duration}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm">
+                    <Dumbbell className="h-4 w-4 text-primary" />
+                    <span>{todaysLift.intensity}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-auto">
+                <Button asChild className="flex-1">
+                  <Link href="/lift">
+                    View Details
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  Start Workout
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="w-full">
@@ -248,6 +323,14 @@ export default async function DashboardPage() {
               <li className="flex items-center">
                 <div className="mr-2 h-2 w-2 rounded-full bg-primary"></div>
                 <span>Explore the dashboard features</span>
+              </li>
+              <li className="flex items-center">
+                <div className="mr-2 h-2 w-2 rounded-full bg-primary"></div>
+                <span>Check out today's workout</span>
+              </li>
+              <li className="flex items-center">
+                <div className="mr-2 h-2 w-2 rounded-full bg-primary"></div>
+                <span>Track your progress over time</span>
               </li>
             </ul>
           </CardContent>

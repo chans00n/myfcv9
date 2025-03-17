@@ -13,7 +13,10 @@ import {
   Users,
   Palette,
   X,
-  LayoutDashboard
+  LayoutDashboard,
+  Dumbbell,
+  Library,
+  CalendarDays
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -185,11 +188,14 @@ function MobileSidebar() {
                   className="w-5 h-5 object-contain"
                 />
               </div>
-              <span className="font-bold">SaaS Starter</span>
+              <span className="font-bold">MYFC</span>
             </Link>
           </div>
           <nav className="flex flex-col px-2 space-y-1">
             <SidebarLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" isMobile={true} />
+            <SidebarLink href="/lift" icon={Dumbbell} label="Today's Lift" isMobile={true} />
+            <SidebarLink href="/lifts" icon={CalendarDays} label="Lift Library" isMobile={true} />
+            <SidebarLink href="/movements" icon={Library} label="Movement Library" isMobile={true} />
             <SidebarLink href="/dashboard/team" icon={Users} label="Team" isMobile={true} />
             <SidebarLink href="/dashboard/general" icon={Settings} label="General" isMobile={true} />
             <SidebarLink href="/dashboard/styles" icon={Palette} label="Styles" isMobile={true} />
@@ -215,6 +221,9 @@ function Sidebar() {
       </Link>
       <nav className="flex flex-col items-center gap-1">
         <SidebarLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" />
+        <SidebarLink href="/lift" icon={Dumbbell} label="Today's Lift" />
+        <SidebarLink href="/lifts" icon={CalendarDays} label="Lift Library" />
+        <SidebarLink href="/movements" icon={Library} label="Movement Library" />
         <SidebarLink href="/dashboard/team" icon={Users} label="Team" />
         <SidebarLink href="/dashboard/general" icon={Settings} label="General" />
         <SidebarLink href="/dashboard/styles" icon={Palette} label="Styles" />
