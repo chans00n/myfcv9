@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { customerPortalAction, getPricingData, getSubscriptionDetailsAction } from '@/lib/payments/actions';
+import { customerPortalAction, customerPortalPaymentMethodsAction, getPricingData, getSubscriptionDetailsAction } from '@/lib/payments/actions';
 import { TeamDataWithMembers } from '@/lib/db/schema';
 import { Check, CreditCard, User as UserIcon } from 'lucide-react';
 import { PricingModal } from './pricing-modal';
@@ -111,8 +111,9 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
 
   return (
     <div className="flex-1 space-y-6 p-4 pt-6">
-      {/* Hidden form for Stripe portal redirects */}
+      {/* Hidden forms for Stripe portal redirects */}
       <form id="subscription-form" action={customerPortalAction} className="hidden" />
+      <form id="payment-methods-form" action={customerPortalPaymentMethodsAction} className="hidden" />
       
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Team Settings</h2>
@@ -226,7 +227,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                     <Button 
                       variant="outline" 
                       className="w-full"
-                      onClick={handleManageSubscription}
+                      onClick={() => {
+                        const form = document.getElementById('payment-methods-form') as HTMLFormElement;
+                        if (form) form.requestSubmit();
+                      }}
                     >
                       Add payment method
                     </Button>

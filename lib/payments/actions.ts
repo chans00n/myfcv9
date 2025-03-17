@@ -14,6 +14,11 @@ export const customerPortalAction = withTeam(async (_, team) => {
   redirect(portalSession.url);
 });
 
+export const customerPortalPaymentMethodsAction = withTeam(async (_, team) => {
+  const portalSession = await createCustomerPortalSession(team);
+  redirect(`${portalSession.url}/payment-methods`);
+});
+
 export const getSubscriptionDetailsAction = withTeam(async (_, team) => {
   if (!team.stripeCustomerId || !team.stripeSubscriptionId) {
     return null;
