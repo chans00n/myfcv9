@@ -9,13 +9,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { LiftDetailClient } from "./client";
 
-type PageProps = {
-  params: {
-    id: string;
-  };
-  searchParams: Record<string, string | string[] | undefined>;
-};
-
 // This would come from your database in a real implementation
 const lifts = [
   {
@@ -405,7 +398,11 @@ const lifts = [
   }
 ];
 
-export default async function LiftDetailPage({ params }: PageProps) {
+export default async function LiftDetailPage({
+  params,
+}: {
+  params: { id: string }
+}) {
   const user = await getUser();
 
   if (!user) {
