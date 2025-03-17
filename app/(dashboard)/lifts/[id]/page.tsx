@@ -125,13 +125,16 @@ const lifts = [
 // Add a type for the props
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function Page(props: Props) {
   // Await the params
   const params = await props.params;
   const id = params.id;
+  
+  // Await searchParams if needed
+  const searchParams = await props.searchParams;
   
   const lift = lifts.find(l => l.id === id);
   
