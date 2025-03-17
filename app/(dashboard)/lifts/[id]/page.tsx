@@ -7,7 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowRight, Play, Calendar, Clock, Dumbbell, Info, Library, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LiftDetailClient } from './client';
+import { LiftDetailClient } from "./client";
+
+type PageProps = {
+  params: {
+    id: string;
+  };
+  searchParams: Record<string, string | string[] | undefined>;
+};
 
 // This would come from your database in a real implementation
 const lifts = [
@@ -398,7 +405,7 @@ const lifts = [
   }
 ];
 
-export default async function LiftDetailPage({ params }: { params: { id: string } }) {
+export default async function LiftDetailPage({ params }: PageProps) {
   const user = await getUser();
 
   if (!user) {

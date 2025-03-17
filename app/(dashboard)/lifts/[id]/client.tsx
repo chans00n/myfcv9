@@ -25,7 +25,7 @@ type Coach = {
   note: string;
 };
 
-type Lift = {
+export type Lift = {
   id: string;
   title: string;
   date: string;
@@ -42,7 +42,7 @@ type Lift = {
   benefits: string[];
 };
 
-interface LiftDetailClientProps {
+export interface LiftDetailClientProps {
   lift: Lift;
   nextLift: Lift | undefined;
 }
