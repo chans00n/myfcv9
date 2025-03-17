@@ -78,11 +78,11 @@ export function PricingModal({ open, onOpenChange, prices }: PricingModalProps) 
           
           <PricingOption
             name="Yearly"
-            price={prices.yearly.amount}
+            price={14.99}
             interval="mo"
-            yearlyPrice={179.99}
+            yearlyPrice={(prices.yearly.amount)}
             savePercent={25}
-            description="Billed $179.99 annually"
+            description={`Billed $${prices.yearly.amount.toFixed(2)} annually`}
             priceId={prices.yearly.id}
             featured={true}
           />
@@ -121,7 +121,7 @@ function PricingOption({
         <div>
           <h3 className="font-medium text-foreground">{name}</h3>
           <div className="flex items-baseline mt-1">
-            <span className="text-2xl font-bold">${price}</span>
+            <span className="text-2xl font-bold">${price.toFixed(2)}</span>
             <span className="text-sm text-muted-foreground ml-1">/{interval}</span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">{description}</p>

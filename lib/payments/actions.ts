@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createCheckoutSession, createCustomerPortalSession, getStripePrices, getStripeProducts } from './stripe';
+import { createCheckoutSession, createCustomerPortalSession, getStripePrices, getStripeProducts, getSubscriptionDetails } from './stripe';
 import { withTeam } from '@/lib/auth/middleware';
 
 export const checkoutAction = withTeam(async (formData, team) => {
@@ -12,6 +12,14 @@ export const checkoutAction = withTeam(async (formData, team) => {
 export const customerPortalAction = withTeam(async (_, team) => {
   const portalSession = await createCustomerPortalSession(team);
   redirect(portalSession.url);
+});
+
+export const getSubscriptionDetailsAction = withTeam(async (_, team) => {
+  if (!team.stripeCustomerId || !team.stripeSubscriptionId) {
+    return null;
+  }
+  
+  return getSubscriptionDetails(team);
 });
 
 export async function getPricingData() {

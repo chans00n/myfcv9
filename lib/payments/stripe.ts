@@ -48,7 +48,7 @@ export async function createCheckoutSession({
 }
 
 export async function createCustomerPortalSession(team: Team) {
-  if (!team.stripeCustomerId || !team.stripeProductId) {
+  if (!team.stripeCustomerId) {
     redirect('/pricing');
   }
 
@@ -58,51 +58,76 @@ export async function createCustomerPortalSession(team: Team) {
   if (configurations.data.length > 0) {
     configuration = configurations.data[0];
   } else {
-    const product = await stripe.products.retrieve(team.stripeProductId);
-    if (!product.active) {
-      throw new Error("Team's product is not active in Stripe");
-    }
-
-    const prices = await stripe.prices.list({
-      product: product.id,
-      active: true
-    });
-    if (prices.data.length === 0) {
-      throw new Error("No active prices found for the team's product");
-    }
-
-    configuration = await stripe.billingPortal.configurations.create({
-      business_profile: {
-        headline: 'Manage your subscription'
-      },
-      features: {
-        subscription_update: {
-          enabled: true,
-          default_allowed_updates: ['price', 'quantity', 'promotion_code'],
-          proration_behavior: 'create_prorations',
-          products: [
-            {
-              product: product.id,
-              prices: prices.data.map((price) => price.id)
-            }
-          ]
+    // If no product ID is available, create a default configuration
+    if (!team.stripeProductId) {
+      configuration = await stripe.billingPortal.configurations.create({
+        business_profile: {
+          headline: 'Manage your subscription'
         },
-        subscription_cancel: {
-          enabled: true,
-          mode: 'at_period_end',
-          cancellation_reason: {
+        features: {
+          subscription_cancel: {
             enabled: true,
-            options: [
-              'too_expensive',
-              'missing_features',
-              'switched_service',
-              'unused',
-              'other'
-            ]
+            mode: 'at_period_end',
+            cancellation_reason: {
+              enabled: true,
+              options: [
+                'too_expensive',
+                'missing_features',
+                'switched_service',
+                'unused',
+                'other'
+              ]
+            }
           }
         }
+      });
+    } else {
+      const product = await stripe.products.retrieve(team.stripeProductId);
+      if (!product.active) {
+        throw new Error("Team's product is not active in Stripe");
       }
-    });
+
+      const prices = await stripe.prices.list({
+        product: product.id,
+        active: true
+      });
+      if (prices.data.length === 0) {
+        throw new Error("No active prices found for the team's product");
+      }
+
+      configuration = await stripe.billingPortal.configurations.create({
+        business_profile: {
+          headline: 'Manage your subscription'
+        },
+        features: {
+          subscription_update: {
+            enabled: true,
+            default_allowed_updates: ['price', 'quantity', 'promotion_code'],
+            proration_behavior: 'create_prorations',
+            products: [
+              {
+                product: product.id,
+                prices: prices.data.map((price) => price.id)
+              }
+            ]
+          },
+          subscription_cancel: {
+            enabled: true,
+            mode: 'at_period_end',
+            cancellation_reason: {
+              enabled: true,
+              options: [
+                'too_expensive',
+                'missing_features',
+                'switched_service',
+                'unused',
+                'other'
+              ]
+            }
+          }
+        }
+      });
+    }
   }
 
   return stripe.billingPortal.sessions.create({
@@ -178,4 +203,79 @@ export async function getStripeProducts() {
         ? product.default_price
         : product.default_price?.id
   }));
+}
+
+export async function getSubscriptionDetails(team: Team) {
+  if (!team.stripeCustomerId || !team.stripeSubscriptionId) {
+    return null;
+  }
+
+  try {
+    // Fetch subscription with expanded price and product
+    const subscription = await stripe.subscriptions.retrieve(team.stripeSubscriptionId, {
+      expand: ['items.data.price.product', 'customer', 'latest_invoice']
+    });
+
+    // Fetch payment methods
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: team.stripeCustomerId,
+      type: 'card',
+      limit: 1
+    });
+
+    // Fetch recent invoices
+    const invoices = await stripe.invoices.list({
+      customer: team.stripeCustomerId,
+      limit: 5,
+      status: 'paid'
+    });
+
+    // Get the current price from the subscription
+    const currentPrice = subscription.items.data[0]?.price;
+    const product = currentPrice?.product as Stripe.Product;
+    
+    // Get features from product metadata or use default features
+    const features = product?.metadata?.features 
+      ? JSON.parse(product.metadata.features) 
+      : ['Full access to all workouts', 'Mobile-friendly platform'];
+
+    return {
+      subscription: {
+        id: subscription.id,
+        status: subscription.status,
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        price: {
+          id: currentPrice?.id,
+          unitAmount: currentPrice?.unit_amount,
+          currency: currentPrice?.currency,
+          interval: currentPrice?.recurring?.interval,
+          intervalCount: currentPrice?.recurring?.interval_count
+        },
+        product: {
+          id: product?.id,
+          name: product?.name,
+          features: features
+        }
+      },
+      paymentMethod: paymentMethods.data.length > 0 ? {
+        id: paymentMethods.data[0].id,
+        brand: paymentMethods.data[0].card?.brand,
+        last4: paymentMethods.data[0].card?.last4,
+        expMonth: paymentMethods.data[0].card?.exp_month,
+        expYear: paymentMethods.data[0].card?.exp_year
+      } : null,
+      invoices: invoices.data.map(invoice => ({
+        id: invoice.id,
+        number: invoice.number,
+        amount: invoice.amount_paid,
+        currency: invoice.currency,
+        date: new Date(invoice.created * 1000),
+        url: invoice.hosted_invoice_url
+      }))
+    };
+  } catch (error) {
+    console.error('Error fetching subscription details:', error);
+    return null;
+  }
 }
