@@ -2,20 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { customerPortalAction, getPricingData, getSubscriptionDetailsAction } from '@/lib/payments/actions';
-import { useActionState } from 'react';
-import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember } from '@/app/(login)/actions';
-import { InviteTeamMember } from './invite-team';
-import { PricingModal } from './pricing-modal';
+import { TeamDataWithMembers } from '@/lib/db/schema';
 import { Check, CreditCard, User as UserIcon } from 'lucide-react';
-
-type ActionState = {
-  error?: string;
-  success?: string;
-};
+import { PricingModal } from './pricing-modal';
 
 type SubscriptionDetails = {
   subscription: {
@@ -64,15 +55,6 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
   });
   const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const [removeState, removeAction, isRemovePending] = useActionState<
-    ActionState,
-    FormData
-  >(removeTeamMember, { error: '', success: '' });
-
-  const getUserDisplayName = (user: Pick<User, 'id' | 'name' | 'email'>) => {
-    return user.name || user.email || 'Unknown User';
-  };
 
   useEffect(() => {
     const fetchSubscriptionDetails = async () => {
@@ -150,22 +132,23 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                     You are currently on the {subscriptionDetails.subscription.product.name}
                   </p>
                   
-                  <div className="flex items-start gap-4 p-4 border rounded-lg bg-muted/20">
+                  <div className="flex flex-col md:flex-row items-start gap-4 p-4 border rounded-lg bg-muted/20">
                     <div className="bg-primary/10 p-2 rounded-full">
                       <UserIcon className="h-5 w-5 text-primary" />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-baseline">
+                    <div className="flex-1 w-full">
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-baseline gap-3 md:gap-0">
                         <h4 className="font-medium">{subscriptionDetails.subscription.product.name}</h4>
                         <Button 
                           variant="outline" 
                           size="sm"
                           onClick={handleManageSubscription}
+                          className="w-full md:w-auto"
                         >
                           Change plan
                         </Button>
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {formatCurrency(subscriptionDetails.subscription.price.unitAmount)}/
                         {subscriptionDetails.subscription.price.interval}, billed {subscriptionDetails.subscription.price.interval}ly
                       </p>
@@ -193,20 +176,21 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                   <p className="text-muted-foreground">Manage your payment methods</p>
                   
                   {subscriptionDetails.paymentMethod ? (
-                    <div className="flex items-start gap-4 p-4 border rounded-lg bg-muted/20">
+                    <div className="flex flex-col md:flex-row items-start gap-4 p-4 border rounded-lg bg-muted/20">
                       <div className="bg-primary/10 p-2 rounded-full">
                         <CreditCard className="h-5 w-5 text-primary" />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-baseline">
+                      <div className="flex-1 w-full">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-baseline gap-3 md:gap-0">
                           <h4 className="font-medium capitalize">
                             {subscriptionDetails.paymentMethod.brand} ending in {subscriptionDetails.paymentMethod.last4}
                           </h4>
-                          <div className="flex gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                             <Button 
                               variant="outline" 
                               size="sm"
                               onClick={handleManageSubscription}
+                              className="w-full sm:w-auto"
                             >
                               Edit
                             </Button>
@@ -214,12 +198,13 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                               variant="outline" 
                               size="sm"
                               onClick={handleManageSubscription}
+                              className="w-full sm:w-auto"
                             >
                               Remove
                             </Button>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground mt-1">
                           Expires {subscriptionDetails.paymentMethod.expMonth}/{subscriptionDetails.paymentMethod.expYear}
                         </p>
                       </div>
@@ -285,8 +270,8 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
               </div>
             ) : (
               <div className="space-y-5">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full">
-                  <div className="mb-4 sm:mb-0">
+                <div className="flex flex-col justify-between items-start w-full">
+                  <div className="mb-4 w-full">
                     <p className="font-medium">
                       Current Plan: {teamData.planName || 'Free'}
                     </p>
@@ -298,7 +283,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                           : 'No active subscription'}
                     </p>
                   </div>
-                  <form id="subscription-form" action={customerPortalAction} className="w-full sm:w-auto">
+                  <form id="subscription-form" action={customerPortalAction} className="w-full">
                     <Button 
                       type="button" 
                       variant="outline"
@@ -313,62 +298,6 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
             )}
           </CardContent>
         </Card>
-
-        {/* Team Members Section */}
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Team Members</CardTitle>
-            <CardDescription>View and manage your team members</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-5">
-              {teamData.teamMembers.map((member, index) => (
-                <li key={member.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage
-                        src={`/placeholder.svg?height=32&width=32`}
-                        alt={getUserDisplayName(member.user)}
-                      />
-                      <AvatarFallback>
-                        {getUserDisplayName(member.user)
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">
-                        {getUserDisplayName(member.user)}
-                      </p>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {member.role}
-                      </p>
-                    </div>
-                  </div>
-                  {index > 1 ? (
-                    <form action={removeAction}>
-                      <input type="hidden" name="memberId" value={member.id} />
-                      <Button
-                        type="submit"
-                        variant="outline"
-                        size="sm"
-                        disabled={isRemovePending}
-                      >
-                        Remove
-                      </Button>
-                    </form>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-            {removeState?.error && (
-              <p className="text-destructive text-sm mt-4">{removeState.error}</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <InviteTeamMember teamId={teamData.id} />
       </div>
 
       <PricingModal 
