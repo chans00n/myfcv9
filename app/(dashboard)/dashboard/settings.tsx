@@ -111,6 +111,9 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
 
   return (
     <div className="flex-1 space-y-6 p-4 pt-6">
+      {/* Hidden form for Stripe portal redirects */}
+      <form id="subscription-form" action={customerPortalAction} className="hidden" />
+      
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Team Settings</h2>
       </div>
@@ -287,16 +290,14 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                           : 'No active subscription'}
                     </p>
                   </div>
-                  <form id="subscription-form" action={customerPortalAction} className="w-full">
-                    <Button 
-                      type="button" 
-                      variant="outline"
-                      className="w-full h-11"
-                      onClick={handleManageSubscription}
-                    >
-                      Manage Subscription
-                    </Button>
-                  </form>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    className="w-full h-11"
+                    onClick={handleManageSubscription}
+                  >
+                    Manage Subscription
+                  </Button>
                 </div>
               </div>
             )}
