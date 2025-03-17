@@ -1,13 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { customerPortalAction } from '@/lib/payments/actions';
+import { customerPortalAction, getPricingData } from '@/lib/payments/actions';
 import { useActionState } from 'react';
 import { TeamDataWithMembers, User } from '@/lib/db/schema';
 import { removeTeamMember } from '@/app/(login)/actions';
 import { InviteTeamMember } from './invite-team';
+import { PricingModal } from './pricing-modal';
 
 type ActionState = {
   error?: string;
@@ -15,6 +17,15 @@ type ActionState = {
 };
 
 export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const [prices, setPrices] = useState<{
+    monthly: { id?: string; amount: number };
+    yearly: { id?: string; amount: number };
+  }>({
+    monthly: { amount: 19.99 },
+    yearly: { amount: 14.99 },
+  });
+
   const [removeState, removeAction, isRemovePending] = useActionState<
     ActionState,
     FormData
@@ -22,6 +33,23 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
 
   const getUserDisplayName = (user: Pick<User, 'id' | 'name' | 'email'>) => {
     return user.name || user.email || 'Unknown User';
+  };
+
+  const handleManageSubscription = async () => {
+    if (teamData.subscriptionStatus === 'active') {
+      // Use the existing form submission for active subscriptions
+      const form = document.getElementById('subscription-form') as HTMLFormElement;
+      if (form) form.submit();
+    } else {
+      // For non-active subscriptions, show the pricing modal
+      try {
+        const pricingData = await getPricingData();
+        setPrices(pricingData);
+        setIsPricingModalOpen(true);
+      } catch (error) {
+        console.error('Error fetching pricing data:', error);
+      }
+    }
   };
 
   return (
@@ -51,11 +79,12 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                         : 'No active subscription'}
                   </p>
                 </div>
-                <form action={customerPortalAction} className="w-full sm:w-auto">
+                <form id="subscription-form" action={customerPortalAction} className="w-full sm:w-auto">
                   <Button 
-                    type="submit" 
+                    type="button" 
                     variant="outline"
                     className="w-full h-11"
+                    onClick={handleManageSubscription}
                   >
                     Manage Subscription
                   </Button>
@@ -102,10 +131,10 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                       <Button
                         type="submit"
                         variant="outline"
-                        className="h-10 px-4"
+                        size="sm"
                         disabled={isRemovePending}
                       >
-                        {isRemovePending ? 'Removing...' : 'Remove'}
+                        Remove
                       </Button>
                     </form>
                   ) : null}
@@ -118,8 +147,14 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
           </CardContent>
         </Card>
 
-        <InviteTeamMember />
+        <InviteTeamMember teamId={teamData.id} />
       </div>
+
+      <PricingModal 
+        open={isPricingModalOpen} 
+        onOpenChange={setIsPricingModalOpen} 
+        prices={prices}
+      />
     </div>
   );
 }

@@ -103,11 +103,12 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 const signUpSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
+  name: z.string().optional(),
   inviteId: z.string().optional(),
 });
 
 export const signUp = validatedAction(signUpSchema, async (data, formData) => {
-  const { email, password, inviteId } = data;
+  const { email, password, inviteId, name } = data;
 
   const existingUser = await db
     .select()
@@ -120,6 +121,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
       error: 'Failed to create user. Please try again.',
       email,
       password,
+      name,
     };
   }
 
@@ -128,6 +130,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const newUser: NewUser = {
     email,
     passwordHash,
+    name: name || '',
     role: 'owner', // Default role, will be overridden if there's an invitation
   };
 
@@ -138,6 +141,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
       error: 'Failed to create user. Please try again.',
       email,
       password,
+      name,
     };
   }
 
@@ -176,7 +180,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
         .where(eq(teams.id, teamId))
         .limit(1);
     } else {
-      return { error: 'Invalid or expired invitation.', email, password };
+      return { error: 'Invalid or expired invitation.', email, password, name };
     }
   } else {
     // Create a new team if there's no invitation
@@ -191,6 +195,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
         error: 'Failed to create team. Please try again.',
         email,
         password,
+        name,
       };
     }
 

@@ -22,7 +22,11 @@ type ActionState = {
   success?: string;
 };
 
-export function InviteTeamMember() {
+interface InviteTeamMemberProps {
+  teamId?: number;
+}
+
+export function InviteTeamMember({ teamId }: InviteTeamMemberProps) {
   const { userPromise } = useUser();
   const user = use(userPromise);
   const isOwner = user?.role === 'owner';

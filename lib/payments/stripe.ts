@@ -37,9 +37,10 @@ export async function createCheckoutSession({
     cancel_url: `${process.env.BASE_URL}/pricing`,
     customer: team.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
+    customer_email: team.stripeCustomerId ? undefined : user.email,
     allow_promotion_codes: true,
     subscription_data: {
-      trial_period_days: 14
+      trial_period_days: 7
     }
   });
 
@@ -171,6 +172,7 @@ export async function getStripeProducts() {
     id: product.id,
     name: product.name,
     description: product.description,
+    metadata: product.metadata,
     defaultPriceId:
       typeof product.default_price === 'string'
         ? product.default_price
