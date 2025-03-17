@@ -1,5 +1,4 @@
-import { redirect, notFound } from 'next/navigation';
-import { getUser } from '@/lib/db/queries';
+import { notFound } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -123,8 +122,17 @@ const lifts = [
   // Add more lifts as needed
 ];
 
-export default function Page({ params }: { params: { id: string } }) {
-  const lift = lifts.find(l => l.id === params.id);
+// Add a type for the props
+type Props = {
+  params: {
+    id: string;
+  };
+  searchParams: Record<string, string | string[] | undefined>;
+};
+
+export default function Page(props: Props) {
+  const id = props.params.id;
+  const lift = lifts.find(l => l.id === id);
   
   if (!lift) {
     notFound();
